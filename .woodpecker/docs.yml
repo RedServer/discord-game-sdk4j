@@ -1,8 +1,8 @@
 steps:
   javadoc:
-    image: maven:3.9.7-eclipse-temurin-21
+    image: gradle:8.14.4-jdk17
     commands:
-      - mvn javadoc:javadoc
+      - ./gradlew --no-daemon javadoc
   upload:
     image: appleboy/drone-scp
     settings:
@@ -15,5 +15,5 @@ steps:
       port:
         from_secret: ssh_port
       target: /config/data/docs/${CI_REPO}/${CI_COMMIT_BRANCH}
-      source: target/site/apidocs/
+      source: build/docs/javadoc/
       strip_components: 3

@@ -68,17 +68,15 @@ attach sources or JavaDocs.
 
 ### Building from source
 
-To install the library from source first of all clone the repository:
-```shell script
-git clone https://github.com/JnCrMx/discord-game-sdk4j.git
-```
+To install the library from source first of all clone the repository.
 
-Finally build (and install) the library with Maven:
+Finally build and install the library into your local Maven repository with Gradle:
 ````shell script
-mvn install
+./gradlew publishToMavenLocal
 ````
 
-If you want to skip the tests (sometimes they fail for really weird reasons), add ``-DskipTests`` to the command arguments.
+On Windows, use `gradlew.bat` instead of `./gradlew`.
+If you want to skip the tests (sometimes they fail for really weird reasons), add ``-x test`` to the command arguments.
 
 ## Usage
 
