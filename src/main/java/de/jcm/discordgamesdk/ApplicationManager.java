@@ -3,6 +3,8 @@ package de.jcm.discordgamesdk;
 import de.jcm.discordgamesdk.impl.Command;
 import de.jcm.discordgamesdk.impl.commands.Authenticate;
 import de.jcm.discordgamesdk.user.DiscordUser;
+import lombok.Value;
+import lombok.experimental.Accessors;
 
 import java.util.Date;
 import java.util.Set;
@@ -12,39 +14,68 @@ public class ApplicationManager
 {
     /**
      * A Discord OAuth2 token.
-     * @param accessToken the access token itself
-     * @param scopes a set of the scopes the token is authorized for
-     * @param expires expiration date of the token
      */
-    public record DiscordOAuth2Token(String accessToken, Set<String> scopes, Date expires) {}
+    @Value
+    @Accessors(fluent = true)
+    public static class DiscordOAuth2Token {
+
+        /** The access token itself. */
+        String accessToken;
+        /** A set of the scopes the token is authorized for. */
+        Set<String> scopes;
+        /** Expiration date of the token. */
+        Date expires;
+    }
 
     /**
      * A Discord application.
-     * @param id ID of the application
-     * @param name Name of the application
-     * @param icon Asset ID of the icon of the application
-     * @param description Description of the application
-     * @param type Type of the application
-     * @param coverImage Asset ID of the cover image of the application
-     * @param summary Summary of the application
-     * @param monetized {@code true} if the application is monetized
-     * @param verified {@code true} if the application is verified
-     * @param verifyKey ???
-     * @param flags Flags of the application
-     * @param hook ???
-     * @param storefrontAvailable {@code true} if the application is available on the storefront
      */
-    public record Application(long id, String name, String icon, String description, String type,
-                              String coverImage, String summary, boolean monetized, boolean verified,
-                              String verifyKey, int flags, boolean hook, boolean storefrontAvailable) {}
+    @Value
+    @Accessors(fluent = true)
+    public static class Application {
+
+        /** ID of the application. */
+        long id;
+        /** Name of the application. */
+        String name;
+        /** Asset ID of the icon of the application. */
+        String icon;
+        /** Description of the application. */
+        String description;
+        /** Type of the application. */
+        String type;
+        /** Asset ID of the cover image of the application. */
+        String coverImage;
+        /** Summary of the application. */
+        String summary;
+        /** {@code true} if the application is monetized. */
+        boolean monetized;
+        /** {@code true} if the application is verified. */
+        boolean verified;
+        /** Verification key of the application. */
+        String verifyKey;
+        /** Flags of the application. */
+        int flags;
+        /** Whether the application uses a hook. */
+        boolean hook;
+        /** {@code true} if the application is available on the storefront. */
+        boolean storefrontAvailable;
+    }
 
     /**
      * Combined data consisting of a {@link DiscordOAuth2Token}, an {@link Application}, and a {@link DiscordUser}
-     * @param token Obtained token
-     * @param application Information about this application
-     * @param user Current Discord user
      */
-    public record AuthenticationData(DiscordOAuth2Token token, Application application, DiscordUser user) {}
+    @Value
+    @Accessors(fluent = true)
+    public static class AuthenticationData {
+
+        /** Obtained token. */
+        DiscordOAuth2Token token;
+        /** Information about this application. */
+        Application application;
+        /** Current Discord user. */
+        DiscordUser user;
+    }
 
     private final Core.CorePrivate core;
 

@@ -36,7 +36,8 @@ public class SocketTest
 			read += (int) channel.read(new ByteBuffer[]{data}, 0, 1);
 		}
 		while(read < length);
-		return new String(data.flip().array());
+		data.flip();
+		return new String(data.array(), 0, data.limit(), StandardCharsets.UTF_8);
 	}
 
 	void send(DiscordChannel channel, ConnectionState state, String message) throws IOException
@@ -48,7 +49,8 @@ public class SocketTest
 		buf.putInt(bytes.length);
 		buf.put(bytes);
 
-		channel.write(buf.flip());
+		buf.flip();
+		channel.write(buf);
 	}
 
 	@Test

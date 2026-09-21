@@ -4,9 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.net.UnixDomainSocketAddress;
-import java.util.*;
-import java.util.stream.IntStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import org.newsclub.net.unix.AFUNIXSocketAddress;
+import org.newsclub.net.unix.AFUNIXSocketChannel;
 
 public class UnixDiscordChannel implements DiscordChannel {
 	private final SocketChannel channel;
@@ -23,12 +27,12 @@ public class UnixDiscordChannel implements DiscordChannel {
 		candidates.removeIf(Objects::isNull);
 		candidates.removeIf(p->!new File(p).exists());
 
-		List<String> flatpakCandidates = candidates.stream().map(p->p+"/app/com.discordapp.Discord").toList();
-		List<String> snapCandidates = candidates.stream().map(p->p+"/snap.discord").toList();
+		List<String> flatpakCandidates = candidates.stream().map(p->p+"/app/com.discordapp.Discord").collect(Collectors.toList());
+		List<String> snapCandidates = candidates.stream().map(p->p+"/snap.discord").collect(Collectors.toList());
 		List<String> additionalSnapCandidates = candidates.stream()
 				.flatMap(p->Arrays.stream(
 						Objects.requireNonNull(new File(p).listFiles((file, name) -> name.startsWith("snap.discord_")))
-				).map(File::getAbsolutePath)).toList();
+				).map(File::getAbsolutePath)).collect(Collectors.toList());
 
 		candidates.addAll(flatpakCandidates);
 		candidates.addAll(snapCandidates);
@@ -37,12 +41,16 @@ public class UnixDiscordChannel implements DiscordChannel {
 		candidates.removeIf(Objects::isNull);
 		candidates.removeIf(p->!new File(p).exists());
 
-		return candidates.stream()
-				.flatMap(p->
-						IntStream.iterate(0, x->x+1)
-								.mapToObj(i->p+"/discord-ipc-"+i)
-								.takeWhile(pp->new File(pp).exists())
-				).toArray(String[]::new);
+		List<String> sockets = new ArrayList<>();
+		for (String candidate : candidates) {
+			for (int i = 0; ; i++) {
+				String socket = candidate + "/discord-ipc-" + i;
+				if (!new File(socket).exists()) break;
+
+				sockets.add(socket);
+			}
+		}
+		return sockets.toArray(new String[0]);
 	}
 
 	public UnixDiscordChannel() throws IOException {
@@ -61,7 +69,7 @@ public class UnixDiscordChannel implements DiscordChannel {
 			path = sockets[i];
 		}
 
-		channel = SocketChannel.open(UnixDomainSocketAddress.of(path));
+		channel = AFUNIXSocketChannel.open(AFUNIXSocketAddress.of(new File(path)));
 	}
 
 	public void close() throws IOException {

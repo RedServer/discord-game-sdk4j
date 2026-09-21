@@ -13,9 +13,9 @@ import de.jcm.discordgamesdk.user.DiscordUser;
 import de.jcm.discordgamesdk.user.Relationship;
 
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -149,16 +149,16 @@ public class Core implements AutoCloseable
 
 		public Queue<Runnable> workQueue = new ArrayDeque<>();
 
-		public int pid = (int) ProcessHandle.current().pid();
+		public int pid = getProcessId();
 		public DiscordUser currentUser;
 		public Map<Long, Relationship> relationships = new HashMap<>();
 		public OverlayUpdateEvent.Data overlayData = new OverlayUpdateEvent.Data();
 		public VoiceSettingsUpdate2Event.Data voiceData = new VoiceSettingsUpdate2Event.Data();
 
-		private static final DiscordEventAdapter NULL_ADAPTER = new DiscordEventAdapter(){};
+		private final DiscordEventAdapter nullAdapter = new DiscordEventAdapter() {};
 		public DiscordEventAdapter getEventAdapter()
 		{
-			return Optional.ofNullable(eventAdapter).orElse(NULL_ADAPTER);
+			return Optional.ofNullable(eventAdapter).orElse(nullAdapter);
 		}
 
 		public void ready()
@@ -244,6 +244,18 @@ public class Core implements AutoCloseable
 		}
 	}
 
+	private static int getProcessId() {
+		String runtimeName = ManagementFactory.getRuntimeMXBean().getName();
+		int pos = runtimeName.indexOf('@');
+		String pid = pos < 0 ? runtimeName : runtimeName.substring(0, pos);
+
+		try {
+			return Integer.parseInt(pid);
+		} catch (NumberFormatException e) {
+			throw new IllegalStateException("Unable to determine the current process ID", e);
+		}
+	}
+
 	private void sendString(String message) throws IOException
 	{
 		byte[] bytes = message.getBytes(StandardCharsets.UTF_8);
@@ -252,8 +264,9 @@ public class Core implements AutoCloseable
 		buf.putInt(state.ordinal());
 		buf.putInt(bytes.length);
 		buf.put(bytes);
+		buf.flip();
 
-		channel.write(buf.flip());
+		channel.write(buf);
 		corePrivate.log(LogLevel.VERBOSE, "Sent string \""+message+"\" at state "+state);
 	}
 
@@ -290,7 +303,8 @@ public class Core implements AutoCloseable
 			read += (int) channel.read(new ByteBuffer[]{data}, 0, 1);
 		}
 		while(read < length);
-		String s = new String(data.flip().array());
+		data.flip();
+		String s = new String(data.array(), 0, data.limit());
 		ConnectionState state1 = ConnectionState.values()[status];
 
 		corePrivate.log(LogLevel.VERBOSE, "Received string \""+s+"\" at state "+state1);

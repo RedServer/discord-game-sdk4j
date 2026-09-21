@@ -10,6 +10,7 @@ import de.jcm.discordgamesdk.user.RelationshipType;
 
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Manager to fetch information about the current user's relationships with other users.
@@ -84,7 +85,7 @@ public class RelationshipManager
 	 */
 	public void filter(Predicate<Relationship> filter)
 	{
-		relationships = core.relationships.values().stream().filter(filter).toList();
+		relationships = core.relationships.values().stream().filter(filter).collect(Collectors.toList());
 	}
 
 	/**

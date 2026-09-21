@@ -233,14 +233,14 @@ public class Activity implements AutoCloseable
 	public void setActivityButtonsMode(ActivityButtonsMode mode)
 	{
 		switch (mode) {
-			case BUTTONS -> {
+			case BUTTONS:
 				buttons = buttonsBak;
 				secrets = null;
-			}
-			case SECRETS -> {
+				break;
+			case SECRETS:
 				secrets = secretsBak;
 				buttons = null;
-			}
+				break;
 		}
 	}
 

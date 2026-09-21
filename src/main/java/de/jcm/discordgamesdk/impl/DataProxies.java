@@ -38,12 +38,20 @@ public class DataProxies
 
 		public Presence toPresence()
 		{
-			OnlineStatus s = switch (status) {
-                case "dnd" -> OnlineStatus.DO_NO_DISTURB;
-                case "idle" -> OnlineStatus.IDLE;
-                case "online" -> OnlineStatus.ONLINE;
-                default -> OnlineStatus.OFFLINE;
-            };
+			OnlineStatus s;
+			switch (status) {
+				case "dnd":
+					s = OnlineStatus.DO_NO_DISTURB;
+					break;
+				case "idle":
+					s = OnlineStatus.IDLE;
+					break;
+				case "online":
+					s = OnlineStatus.ONLINE;
+					break;
+				default:
+					s = OnlineStatus.OFFLINE;
+			}
 
             return new Presence(s, Optional.ofNullable(activity).map(ActivityImpl::toActivity).orElse(null));
 		}

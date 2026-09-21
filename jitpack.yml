@@ -1,8 +1,4 @@
 jdk:
-    - openjdk16
-before_install:
-    - source ~/.sdkman/bin/sdkman-init.sh
-    - sdk install java 16.0.2-open
+    - eclipse-temurin:8-jdk
 install:
-    - source ~/.sdkman/bin/sdkman-init.sh
     - ./gradlew --no-daemon publishToMavenLocal -x test

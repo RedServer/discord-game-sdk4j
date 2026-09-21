@@ -9,6 +9,9 @@ repositories {
 
 dependencies {
     api 'com.google.code.gson:gson:2.9.1'
+    implementation 'com.kohlschutter.junixsocket:junixsocket-core:2.11.1'
+    compileOnly 'org.projectlombok:lombok:1.18.48'
+    annotationProcessor 'org.projectlombok:lombok:1.18.48'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.4.0'
@@ -16,7 +19,7 @@ dependencies {
 }
 
 java {
-    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_16
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
     withSourcesJar()
     withJavadocJar()
 }
@@ -48,6 +51,9 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+    if (JavaVersion.current().isJava9Compatible()) {
+        options.release = 8
+    }
 }
 
 tasks.withType(Javadoc).configureEach {
